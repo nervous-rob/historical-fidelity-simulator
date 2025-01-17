@@ -8,10 +8,14 @@ A unified simulator for studying historical fidelity through both classical and 
 - Customizable scaling function for critical phenomena
 - Phase transition analysis
 - Historical fidelity tracking
-- Support for system sizes up to 100 sites
+- Support for system sizes up to 100 sites (classical) or 10 sites (quantum)
 - Comprehensive visualization tools
-- Quantum decoherence modeling
-- Critical scaling analysis
+- Advanced quantum features:
+  - Temperature-dependent decoherence
+  - Lindblad master equation evolution
+  - Von Neumann entropy tracking
+  - Quantum uncertainty products
+  - Transverse-field Ising model
 
 ## Installation
 
@@ -58,28 +62,60 @@ history = sim.run_simulation(n_steps=5000, dt=0.1)
 fig, ax = plot_simulation_history(history, "Classical Simulation")
 ```
 
-### Quantum Simulation
+### Quantum Simulation with Decoherence
 ```python
-# Create a quantum simulator
-sim = GeneralizedHistoricalSimulator(
-    n_sites=4,  # Smaller system size for quantum simulation
+from historical_fidelity_simulator.quantum import (
+    construct_ising_hamiltonian,
+    QuantumEvolver
+)
+import qutip as qt
+
+# Create Hamiltonian
+H = construct_ising_hamiltonian(
+    n_sites=4,
     coupling_strength=1.0,
     field_strength=0.5,
-    temperature=2.0,
-    hbar_h=1.0,
-    mode=SimulationMode.QUANTUM
+    periodic=True  # Use periodic boundary conditions
 )
 
-# Run simulation with decoherence
-history = sim.run_simulation(n_steps=1000, dt=0.1)
+# Initialize quantum evolver with temperature-dependent decoherence
+evolver = QuantumEvolver(
+    hamiltonian=H,
+    n_sites=4,
+    temperature=2.0
+)
+
+# Create initial state |↑↑↑↑⟩
+up = qt.basis([2], 0)
+initial_state = qt.tensor([up] * 4)
+
+# Evolve with decoherence
+final_state, evolution_data = evolver.evolve_state(
+    initial_state=initial_state,
+    dt=0.1,
+    store_states=True
+)
+
+# Compute observables
+magnetization, entropy = compute_observables(final_state, n_sites=4)
+
+# Calculate uncertainty product
+uncertainty = evolver.compute_uncertainty_product(
+    initial_state=initial_state,
+    dt=0.1,
+    n_samples=10
+)
 ```
 
-### Custom Scaling Function
+### Custom Scaling Function with Critical Behavior
 ```python
 def custom_scaling(energy: float, temperature: float) -> float:
     """Custom critical scaling function."""
-    T_c = 2.0
-    return 1.0 + energy/temperature + 0.5 * (temperature/T_c)**(-0.8)
+    T_c = 2.0  # Critical temperature
+    alpha = 0.5  # Scaling prefactor
+    beta = -0.8  # Critical exponent
+    
+    return 1.0 + energy/temperature + alpha * (temperature/T_c)**beta
 
 sim = GeneralizedHistoricalSimulator(
     n_sites=20,
@@ -91,27 +127,24 @@ sim = GeneralizedHistoricalSimulator(
 )
 ```
 
-## Development
-
-- Follow PEP 8 style guide
-- Use type hints
-- Maintain test coverage above 90%
-- Run tests: `pytest tests/`
-- Format code: `black src/ tests/`
-- Type checking: `mypy src/`
-
-### Project Structure
+## Project Structure
 ```
 historical-fidelity-simulator/
 ├── historical_fidelity_simulator/  # Main package directory
 │   ├── simulator.py               # Core simulation framework
-│   ├── quantum/                  # Quantum-specific implementations
+│   ├── quantum/                   # Quantum-specific implementations
+│   │   ├── operators.py          # Quantum operators and observables
+│   │   ├── evolution.py          # Quantum state evolution
+│   │   └── README.md             # Quantum module documentation
 │   ├── classical/                # Classical physics implementations
 │   └── utils/                    # Shared utilities and visualization
-├── tests/                       # Test suite
-├── examples/                    # Example notebooks
-├── docs/                       # Documentation
-└── benchmarks/                 # Performance benchmarks
+├── tests/                        # Test suite
+│   ├── test_quantum.py          # Quantum module tests
+│   ├── test_simulator.py        # Core simulator tests
+│   └── test_visualization.py    # Visualization tests
+├── examples/                     # Example notebooks
+├── docs/                        # Documentation
+└── benchmarks/                  # Performance benchmarks
 ```
 
 ## Theory
@@ -135,6 +168,43 @@ The default scaling function includes critical behavior:
 ```
 f(E,T) = 1 + E/T + α(T/T_c)^β
 ```
+
+### Quantum Implementation
+
+The quantum mode implements:
+1. Transverse-field Ising Hamiltonian:
+   ```
+   H = -J Σ σ_i^x σ_{i+1}^x - h Σ σ_i^z
+   ```
+
+2. Temperature-dependent decoherence through Lindblad operators:
+   - Dephasing (σ_z)
+   - Energy relaxation (σ_-)
+   - Energy excitation (σ_+)
+   - Rates satisfy detailed balance
+
+3. Quantum observables:
+   - Magnetization
+   - Von Neumann entropy
+   - Historical fidelity
+   - Uncertainty products
+
+## Development
+
+- Follow PEP 8 style guide
+- Use type hints
+- Maintain test coverage above 90%
+- Run tests: `pytest tests/`
+- Format code: `black src/ tests/`
+- Type checking: `mypy src/`
+
+### Performance Notes
+
+- Classical mode: Efficient for systems up to 100 sites
+- Quantum mode: Limited by QuTiP tensor operations
+  - Recommended maximum: 10 sites
+  - Memory usage scales exponentially with system size
+  - Use periodic boundary conditions for better physics
 
 ## License
 
