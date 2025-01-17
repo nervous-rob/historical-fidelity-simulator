@@ -1,0 +1,8 @@
+numpy
+scipy
+qutip
+matplotlib
+pytest
+black
+mypy
+pylint 
