@@ -27,7 +27,17 @@ warn_unused_configs = true
 disallow_untyped_defs = true
 check_untyped_defs = true
 
+# Add type checking for GPU-related modules
+[[tool.mypy.overrides]]
+module = ["numba.*", "cupy.*"]
+ignore_missing_imports = true
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
-addopts = "-v --tb=short" 
+addopts = "-v --tb=short"
+
+[tool.coverage.run]
+omit = [
+    "historical_fidelity_simulator/utils/gpu_accelerator.py",  # GPU code is conditionally imported
+] 

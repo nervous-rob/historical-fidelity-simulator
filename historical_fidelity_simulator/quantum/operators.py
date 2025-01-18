@@ -198,8 +198,13 @@ def compute_observables(
     magnetization /= n_sites
     
     # Compute von Neumann entropy
+    # For pure states, convert to density matrix first
+    if state.type == 'ket':
+        rho = state * state.dag()
+    else:
+        rho = state
     # First trace out all but one site to get reduced density matrix
-    rho_reduced = state.ptrace(0)
-    entropy = -qt.entropy_vn(rho_reduced)
+    rho_reduced = rho.ptrace(0)
+    entropy = qt.entropy_vn(rho_reduced)
     
     return magnetization, entropy 

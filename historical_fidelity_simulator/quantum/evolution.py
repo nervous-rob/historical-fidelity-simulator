@@ -126,13 +126,14 @@ class QuantumEvolver:
         validate_quantum_state(initial_state, self.n_sites)
         validate_evolution_params(dt)
         
-        # Set up the master equation solver
+        # Set up the master equation solver with options as dict
+        solver_options = {'store_states': store_states}
         result = qt.mesolve(
             H=self.hamiltonian,
             rho0=initial_state,
             tlist=[0, dt],
             c_ops=self.c_ops,
-            options=qt.Options(store_states=store_states)
+            options=solver_options
         )
         
         # Get the final state
@@ -195,11 +196,14 @@ class QuantumEvolver:
         
         # Evolve with intermediate points
         times = np.linspace(0, dt, n_samples)
+        # Use dict for solver options
+        solver_options = {'store_states': True}
         result = qt.mesolve(
             H=self.hamiltonian,
             rho0=initial_state,
             tlist=times,
-            c_ops=self.c_ops
+            c_ops=self.c_ops,
+            options=solver_options
         )
         
         # Compute fidelities at each point

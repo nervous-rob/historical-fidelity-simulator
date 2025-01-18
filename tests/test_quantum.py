@@ -93,11 +93,16 @@ def test_observables():
     # Pure state should have zero entropy
     assert abs(entropy) < 1e-10
     
-    # Test mixed state
-    mixed_state = 0.5 * (qt.tensor(up, up) * qt.tensor(up, up).dag() +
-                        qt.tensor(down, down) * qt.tensor(down, down).dag())
+    # Test mixed state (equal mixture of |↑↑⟩ and |↓↓⟩)
+    up_up = qt.tensor(up, up)
+    down_down = qt.tensor(down, down)
+    mixed_state = 0.5 * (up_up * up_up.dag() + down_down * down_down.dag())
+    
+    # For this maximally mixed 2-state system, entropy should be ln(2)
     _, mixed_entropy = compute_observables(mixed_state, n_sites=2)
-    assert mixed_entropy > 0  # Mixed state should have positive entropy
+    # The entropy should be positive and close to ln(2)
+    assert mixed_entropy > 0
+    assert abs(mixed_entropy - 0.693147) < 1e-5  # ln(2) ≈ 0.693147
 
 
 def test_quantum_evolution(small_system_params):
@@ -133,7 +138,8 @@ def test_quantum_evolution(small_system_params):
     assert len(evolution_data['times']) == 2  # Start and end times
     
     # State should change due to evolution
-    assert not qt.states.ket_state.equivalent(final_state, initial_state)
+    fidelity = abs((initial_state.dag() * final_state)[0,0])**2
+    assert fidelity < 0.99  # States should be different
 
 
 def test_fidelity_computation(small_system_params):

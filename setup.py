@@ -25,10 +25,12 @@ setup(
     packages=find_packages(),
     python_requires=">=3.8",
     install_requires=[
-        "numpy",
-        "scipy",
-        "qutip",
-        "matplotlib",
+        "numpy>=1.20.0",
+        "scipy>=1.7.0",
+        "qutip>=4.6.0",
+        "matplotlib>=3.4.0",
+        "tqdm>=4.62.0",
+        "numba>=0.54.0",  # Required for base functionality
     ],
     extras_require={
         "dev": [
@@ -36,6 +38,12 @@ setup(
             "black",
             "mypy",
             "pylint",
+            "ipykernel",
+            "jupyter",
+        ],
+        "gpu": [
+            "cupy-cuda11x>=11.0.0",  # For CUDA 11.x
+            # OR "cupy-cuda12x>=12.0.0",  # For CUDA 12.x
         ],
     },
     classifiers=[
@@ -48,5 +56,6 @@ setup(
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
         "Topic :: Scientific/Engineering :: Physics",
+        "Environment :: GPU :: NVIDIA CUDA :: 11.0",  # Add GPU support indicator
     ],
 ) 
