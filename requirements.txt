@@ -1,13 +1,18 @@
+# Core dependencies
 numpy>=1.20.0
 scipy>=1.7.0
 qutip>=4.6.0
 matplotlib>=3.4.0
-pytest
-black
-mypy
-pylint
 tqdm>=4.62.0
-ipykernel
-jupyter
 numba>=0.54.0
+
+# Development dependencies
+pytest>=7.0.0
+black>=22.0.0
+mypy>=1.0.0
+pylint>=2.15.0
+ipykernel>=6.0.0
+jupyter>=1.0.0
+
+# Optional GPU support
 cupy-cuda11x>=11.0.0  # For CUDA 11.x, adjust version based on your CUDA installation

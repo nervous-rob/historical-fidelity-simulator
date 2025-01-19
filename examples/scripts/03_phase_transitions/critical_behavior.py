@@ -82,7 +82,8 @@ def run_classical_analysis(
                 field_strength=params['h'],
                 temperature=T,
                 hbar_h=params['hbar_h'],
-                mode=SimulationMode.CLASSICAL
+                mode=SimulationMode.CLASSICAL,
+                use_gpu=False
             )
             
             sim_results = sim.run_simulation(
@@ -357,8 +358,7 @@ def run_quantum_sweep(
                 field_strength=params['h'],
                 temperature=T,
                 hbar_h=params['hbar_h'],
-                mode=SimulationMode.QUANTUM,
-                use_gpu=True  # Quantum simulations should use GPU
+                mode=SimulationMode.QUANTUM
             )
             
             sim_results = sim.run_simulation(
