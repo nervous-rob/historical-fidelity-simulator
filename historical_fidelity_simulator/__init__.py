@@ -1,11 +1,15 @@
-"""Historical Fidelity Simulator package.
+"""Historical Fidelity Simulator Package
 
-A unified simulator for studying historical fidelity through both classical and quantum approaches,
-investigating the concept of an information Planck constant (ℏ_h) and its generalized uncertainty relation.
+A package for simulating and analyzing historical fidelity in both classical and quantum systems.
 """
 
-__version__ = "0.1.0"
-
 from .simulator import GeneralizedHistoricalSimulator, SimulationMode
+from . import analysis
 
-__all__ = ["GeneralizedHistoricalSimulator", "SimulationMode"] 
+__all__ = [
+    'GeneralizedHistoricalSimulator',
+    'SimulationMode',
+    'analysis'
+]
+
+__version__ = '0.1.0' 
