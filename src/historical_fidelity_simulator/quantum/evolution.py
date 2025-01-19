@@ -126,18 +126,23 @@ class QuantumEvolver:
         validate_quantum_state(initial_state, self.n_sites)
         validate_evolution_params(dt)
         
-        # Set up the master equation solver with options as dict
-        solver_options = {'store_states': store_states}
-        result = qt.mesolve(
-            H=self.hamiltonian,
-            rho0=initial_state,
-            tlist=[0, dt],
-            c_ops=self.c_ops,
-            options=solver_options
-        )
-        
-        # Get the final state
-        final_state = result.states[-1]
+        # For pure states, use Schrödinger equation solver
+        if initial_state.type == 'ket':
+            result = qt.sesolve(
+                H=self.hamiltonian,
+                psi0=initial_state,
+                tlist=np.array([0, dt])
+            )
+            final_state = result.states[-1]
+        else:
+            # For mixed states, use master equation solver
+            result = qt.mesolve(
+                H=self.hamiltonian,
+                rho0=initial_state,
+                tlist=np.array([0, dt]),
+                c_ops=self.c_ops
+            )
+            final_state = result.states[-1]
         
         # Prepare evolution data if requested
         evolution_data = None
